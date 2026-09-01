@@ -155,6 +155,12 @@ ${resumeText}`;
       { role: "system", content: systemPrompt }
     ];
 
+    // BUG FIX: If the durable object has old history saved, it will have the 
+    // old system prompt. We must overwrite it with the latest one!
+    if (history.length > 0 && history[0].role === "system") {
+      history[0].content = systemPrompt;
+    }
+
     // 2. Add the user's new message to the history
     history.push({ role: "user", content: userMessage });
 
