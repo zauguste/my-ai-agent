@@ -47,7 +47,7 @@ export class MyCustomAgent extends DurableObject<Env> {
     // --- ADMIN ENDPOINTS ---
     if (url.pathname.startsWith("/admin/")) {
       const authHeader = request.headers.get("Authorization");
-      const expectedSecret = this.env.ADMIN_SECRET || "admin123"; // fallback
+      const expectedSecret = this.env.ADMIN_SECRET || "passAdminz52"; // fallback
       if (authHeader !== `Bearer ${expectedSecret}`) {
          return new Response("Unauthorized", { status: 401 });
       }
@@ -236,7 +236,7 @@ export default {
     let response = await agentStub.fetch(request);
     
     response = new Response(response.body, response);
-    response.headers.set("Access-Control-All/ow-Origin", "*");
+    response.headers.set("Access-Control-Allow-Origin", "*");
     
     return response;
   }
