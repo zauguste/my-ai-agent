@@ -81,9 +81,22 @@ export class MyCustomAgent extends DurableObject<Env> {
         
         let history = await this.ctx.storage.get<any[]>(`session:${targetSession}`) || [];
         
-        // Remove the message at the specified index
-        if (messageIndex >= 0 && messageIndex < history.length) {
-          history.splice(messageIndex, 1);
+        // The frontend passes an index based on the display history (which excludes 'system' roles)
+        // We need to map that index to the real index in the raw history array.
+        let realIndex = -1;
+        let displayCount = 0;
+        for (let i = 0; i < history.length; i++) {
+          if (history[i].role !== 'system') {
+            if (displayCount === messageIndex) {
+              realIndex = i;
+              break;
+            }
+            displayCount++;
+          }
+        }
+        
+        if (realIndex !== -1) {
+          history.splice(realIndex, 1);
           await this.ctx.storage.put(`session:${targetSession}`, history);
           await this.ctx.storage.put(`sessionActivity:${targetSession}`, Date.now());
           return new Response(JSON.stringify({ success: true }), { headers: { "content-type": "application/json" }});
